@@ -1,7 +1,6 @@
 'use strict';
 ///////////////////////////////////////
 // Modal window
-
 const modalWindow = document.querySelector('.modal-window');
 const overlay = document.querySelector('.overlay');
 const btnCloseModalWindow = document.querySelector('.btn--close-modal-window');
@@ -10,6 +9,13 @@ const btnsOpenModalWindow = document.querySelectorAll(
 );
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+
+const tabs = document.querySelectorAll('.operations__tab');
+const tabContainer = document.querySelector('.operations__tab-container');
+const tabsContents = document.querySelectorAll('.operations__content');
+
+const nav = document.querySelector('.nav');
+
 const openModalWindow = function (e) {
   e.preventDefault();
   modalWindow.classList.remove('hidden');
@@ -45,9 +51,7 @@ message.innerHTML =
 
 const header = document.querySelector('.header');
 header.append(message);
-
 const btnClose = document.querySelector('.btn--close-cookie');
-
 btnClose.addEventListener('click', function () {
   message.remove();
 });
@@ -73,9 +77,6 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 });
 
 //Tabs
-const tabs = document.querySelectorAll('.operations__tab');
-const tabContainer = document.querySelector('.operations__tab-container');
-const tabsContents = document.querySelectorAll('.operations__content');
 
 tabContainer.addEventListener('click', function (e) {
   const clickedButton = e.target.closest('.operations__tab');
@@ -92,4 +93,35 @@ tabContainer.addEventListener('click', function (e) {
   document
     .querySelector(`.operations__content--${clickedButton.dataset.tab}`)
     .classList.add('operations__content--active');
+});
+
+//Nav animation
+const navLinksHoverAnimation = function (e, opacity) {
+  if (e.target.classList.contains('nav__link')) {
+    const linkOver = e.target;
+    const siblingLinks = linkOver
+      .closest('.nav__links')
+      .querySelectorAll('.nav__link');
+    const logo = linkOver.closest('.nav').querySelector('img');
+    const logoText = linkOver.closest('.nav').querySelector('.nav__text');
+
+    siblingLinks.forEach(el => {
+      if (el !== linkOver) el.style.opacity = this;
+    });
+    logo.style.opacity = this;
+    logoText.style.opacity = this;
+  }
+};
+
+nav.addEventListener('mouseover', navLinksHoverAnimation.bind(0.4));
+nav.addEventListener('mouseout', navLinksHoverAnimation.bind(1));
+
+//Sticky navigation
+const section1Coords = section1.getBoundingClientRect();
+window.addEventListener('scroll', function (e) {
+  if (window.scrollY > section1Coords.top) {
+    nav.classList.add('sticky');
+  } else {
+    nav.classList.remove('sticky');
+  }
 });
