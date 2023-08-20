@@ -59,7 +59,7 @@ btnClose.addEventListener('click', function () {
 //Smooth page navigation
 btnScrollTo.addEventListener('click', function (e) {
   const section1Coords = section1.getBoundingClientRect();
-  console.log(section1Coords);
+  //console.log(section1Coords);
   // window.scrollTo({
   //   left: section1Coords.left + window.pageXOffset,
   //   top: section1Coords.top + window.pageYOffset,
@@ -117,11 +117,72 @@ nav.addEventListener('mouseover', navLinksHoverAnimation.bind(0.4));
 nav.addEventListener('mouseout', navLinksHoverAnimation.bind(1));
 
 //Sticky navigation
-const section1Coords = section1.getBoundingClientRect();
-window.addEventListener('scroll', function (e) {
-  if (window.scrollY > section1Coords.top) {
+// const section1Coords = section1.getBoundingClientRect();
+// window.addEventListener('scroll', function (e) {
+//   if (window.scrollY > section1Coords.top) {
+//     nav.classList.add('sticky');
+//   } else {
+//     nav.classList.remove('sticky');
+//   }
+// });
+
+//Sticky navigation - Intersection Observer API
+const navHeight = nav.getBoundingClientRect().height;
+const getStickyNav = function (entries) {
+  const entry = entries[0];
+  // console.log(entry);
+  if (!entry.isIntersecting) {
     nav.classList.add('sticky');
   } else {
     nav.classList.remove('sticky');
   }
+};
+
+const headerObserver = new IntersectionObserver(getStickyNav, {
+  root: null,
+  threshold: 0,
+  rootMargin: `-${navHeight}px`,
 });
+
+headerObserver.observe(header);
+
+//Появление частей сайта
+const allSections = document.querySelectorAll('.section');
+const appearanceSection = function (entries, observer) {
+  const entry = entries[0];
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
+const sectionObserver = new IntersectionObserver(appearanceSection, {
+  root: null,
+  threshold: 0.25,
+});
+
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
+
+//Lazy loading for img
+const lazyImages = document.querySelectorAll('img[data-src]');
+const loadImages = function (entries, observer) {
+  const entry = entries[0];
+
+  if (!entry.isIntersecting) return;
+
+  //Меняем изображение на высокое разрешение
+  entry.target.src = entry.target.dataset.src;
+  // entry.target.classList.remove('lazy-img');
+
+  entry.target.addEventListener('load', function () {
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const lazyImagesObserver = new IntersectionObserver(loadImages, {
+  root: null,
+  threshold: 0.5,
+});
+lazyImages.forEach(image => lazyImagesObserver.observe(image));
